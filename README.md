@@ -1,5 +1,5 @@
 # 记录自己的代码之路
-
+## 同志们注意：本人比较菜，所以所有总结均摘抄自他人的的文章或者发布，在这里只是单纯的为了方便自己日后的查看
 生命不息，代码不止
 
 ![image](https://github.com/Feng3333/Algorithm-and-data-structure/blob/1028de48b4208b5a7569becb62b386a8f10bdd34/images-folder/jinx%E8%87%B3%E8%87%BB.jpg)
