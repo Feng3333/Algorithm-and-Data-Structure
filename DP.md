@@ -121,3 +121,37 @@ public:
 时间复杂度：共有 N\*C 个状态需要转移，复杂度为O(N\*C)   
 空间复杂度：O(C)  
 
+#### dp[C+1]解法
+事实上，还能继续进行空间优化，只保留代表「剩余容量」的维度。  
+再次观察「转移方程」：  
+```c++
+dp[i][c] = max (dp[i-1][c] , dp[i-1][c-v[i]] + w[i]);
+```
+不难发现当求解第 i 行格子的值时，不仅是只依赖第 i-1 行，还明确只依赖第 i-1 行的第 c 个格子和第 c-v[i] 个格子（也就是对应着第 i 个物品不选和选的两种情况）。  
+换句话说，只依赖于「上一个格子的位置」以及「上一个格子的左边位置」。  
+![image](https://github.com/Feng3333/Algorithm-and-data-structure/blob/ab77ba4608864715c648ec1923b30d7abc98ff1a/images-folder/dp1.png)  
+因此，只要我们将求解的第 i 个格子的顺序 [从0到c] 改为 [从c到0] ，就可以将原本2行的的二维数组压缩到1行 (转换为一维数组)    
+*这样做的空间复杂度和「滚动数组」优化的空间复杂度是一样的。但仍然具有意义，而且这样的「一维空间」优化，是求解其他背包问题的基础，需要重点掌握*  
+
+具体代码：
+```c++
+class Solution {
+public:
+    int masValue(int N, int C, vector<int> & v, vector<int> & w) {
+        vector<int> dp(C+1);
+        for (int i=0; i<N; i++) {
+            for (int j=C; j>=v[i]; j--) {
+                //不选该物品
+                int n = dp[j];
+                //选择该物品
+                int y = dp[j-v[i]]+w[i];
+                dp[j] = max(n,y);
+            }
+        }
+        
+        return dp[C];
+    }
+}
+```
+时间复杂度：共有 N\*C 个状态需要转移，复杂度为O(N\*C)   
+空间复杂度：O(C) 
