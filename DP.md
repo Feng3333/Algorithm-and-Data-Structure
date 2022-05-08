@@ -192,4 +192,79 @@ tips：其实就是在 01-背包问题的基础上，增加了每件物品可以
 ```
 
 #### 常规解法
-https://mp.weixin.qq.com/s?__biz=MzU4NDE3MTEyMA==&mid=2247486107&idx=1&sn=e5fa523008fc5588737b7ed801caf4c3&chksm=fd9ca184caeb28926959c0987208a3932ed9c965267ed366b5b82a6fc16d42f1ff40c29db5f1&token=990510480&lang=zh_CN&scene=21#wechat_redirect
+这里可以直接将 01背包的 [状态定义] 拿过来用:    
+dp[i][j] 代表考虑前 i 件物品，放入一个容量为 j 的背包可以获得的最大价值。  
+由于每件物品可以被选择多次，因此对于某个 dp[i][j] 而言，其值应该为以下所有可能方案中的最大值：
+ .选择 0 件物品 i 的最大价值，即 dp[i-1][j];  
+ .选择 1 件物品 i 的最大价值，即 dp[i-1][j-v[i]] + w[i];    
+ .选择 2 件物品 i 的最大价值，即 dp[i-1][j-2*v[i]] + 2\*w[i];    
+ . . .    
+ 
+ .选择 k 件物品 i 的最大价值，即 dp[i-1][j-k*v[i]] + k\*w[i];     
+ 
+由此可以得出 [状态转移方程] 为:  
+```
+dp[i][j] = max(dp[i-1][j],dp[i-1][j-k*v[i]] + k*w[i]);
+```
+
+代码实现:
+```c++
+class Solution {
+public:
+    int maxValue (int N, int C, vector<int> & v, vector<int> & w) {
+        vector<vector<int>> dp(N,vector<int>(C+1));
+        
+        //先预处理第一件物品
+        for (int j=0; j<=C; ++j) {
+            //当只有一件物品的时候，在容量允许的情况下，能选多少件就选多少件
+            int maxK = j/v[0];
+            dp[0][j] = maxK*w[0];
+        }
+        
+        //处理其余物品
+        for (int i=0; i<N; i++) {
+            for (int j=0; j<=C; j++) {
+                //不选则第i件物品
+                int n = dp[i-1][j];
+                
+                //考虑第i件物品的情况
+                int y=0;
+                for (int k=1; ;k++) {
+                    if (j < v[i]*k) {
+                        break;
+                    }
+                    y = max(y,dp[i-1][j-k*v[i]] + k* w[i]);
+                }
+                dp[i][j] = max(n,y);
+            }
+        }
+        
+        return dp[N-1][C];
+    }
+}
+```
+时间复杂度：共有 N\*C个状态需要转移，但每次转移都需要枚举当前物品的件数，最多枚举 C 次(重量为最小值 1) ，因此整体复杂度为 O(N\*C\*C);  
+空间复杂度：O(N\*C)
+
+#### [滚动数组]解法
+ 通过观察[状态转移方程]可以发现，在更新某个dp[i][x]的时候只依赖于dp[i-1][x];
+ 因此可以像 01背包 那样使用 [滚动数组] 的方式将空间优化到 O(C);  
+ 
+ 代码实现：
+ ```c++
+ class Solution {
+ public:
+     int maxValue(int N, int C, vector<int> & v, vector<int> & w) {
+         vector<vector<int>> dp(2,vector<int>(C+1));
+         
+          //先预处理第一件物品
+        for (int j=0; j<=C; ++j) {
+            //当只有一件物品的时候，在容量允许的情况下，能选多少件就选多少件
+            int maxK = j/v[0];
+            dp[0][j] = maxK*w[0];
+        }
+        
+     }
+ }
+ ```
+
