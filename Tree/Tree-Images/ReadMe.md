@@ -1,1 +1,1 @@
-# Tree-Images用于放置tree的图片
+# Tree-Images用于放置图片
