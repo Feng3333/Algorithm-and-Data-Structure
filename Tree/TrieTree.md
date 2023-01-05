@@ -2,7 +2,8 @@
 ## 目录
  - [1. 什么是Trie树](#1-什么是trie树)
  - [2. 设计实现字典树](#2-设计实现字典树)
-   - [2.1. 基本实现](#21-基本实现)
+   - [2.1. 利用结构体的封装实现模板](#21-利用结构体的封装实现模板)
+   - [2.2. 基本实现](#22-基本实现)
  -
  
 
@@ -42,7 +43,38 @@ c.每个节点的所有子节点包含的字符都不相同，也就是找到对
 - 若当前累计删除字符长度等于字符串的长度, 将当前节点的 isEnd 置为 false; 
 - 重复上述步骤纸质删除完所有节点, 判断当前节点对应的 isEnd 是否为 false, 如果是则说明删除成功, 否则失败; 
 
-### 2.1 基本实现
+### 2.1 利用结构体的封装实现模板
+
+```c++
+struct trienode {
+    int nex[100000][26], cnt; //以26个小写字母为例，cnt记录当前字母在word当中的位置
+    bool isEnd[100000]; //记录以该节点为结尾的字符串是否存在
+
+    void insert(char* s, int len) {
+        int pos = 0;
+        for (int i = 0; i < len; ++i) {
+            int ch = s[i] - 'a';
+            if (!nex[pos][ch]) {
+                nex[pos][ch] = ++cnt;
+            }
+            pos = nex[pos][ch];
+        }
+        isEnd[pos] = true;
+    }
+
+    bool find(char* s, int len) {
+        int pos = 0;
+        for (int i = 0; i < len; ++i) {
+            int ch = s[i] - 'a';
+            if (!nex[pos][ch]) return false;
+            pos = nex[pos][ch];
+        }
+        return isEnd[pos];
+    }
+};
+```
+
+### 2.2 基本实现
 ```c++
 #include <iostream>
 #include <string>
@@ -52,6 +84,7 @@ class Trie {
 private:
     std::vector<Trie*> children; //孩子节点
     bool isEnd; //完整字符串标志位
+    
 public:
     Trie() {
         children.resize(26, nullptr); //这里以字符串中存26个小写字母为例
@@ -96,6 +129,20 @@ public:
         }
         return !node->isEnd;
     }
+    
+    //查找是否存在某个单词前缀
+    bool StartWith(std::string prefix) {
+        Trie* node = this;
+        for (auto& ch :prefix) {
+            int pos = ch - 'a';
+            if (node->children[pos] != nullptr) {
+                node = node->children[pos];
+            } else {
+                return false;
+            }
+        }
+        return true;
+    }
 };
 
 int main() {
@@ -116,3 +163,4 @@ int main() {
     return 0;
 }
 ```
+
