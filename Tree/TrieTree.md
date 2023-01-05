@@ -44,5 +44,75 @@ c.每个节点的所有子节点包含的字符都不相同，也就是找到对
 
 ### 2.1 基本实现
 ```c++
+#include <iostream>
+#include <string>
+#include <vector>
 
+class Trie {
+private:
+    std::vector<Trie*> children; //孩子节点
+    bool isEnd; //完整字符串标志位
+public:
+    Trie() {
+        children.resize(26, nullptr); //这里以字符串中存26个小写字母为例
+        isEnd = false;
+    }
+
+    void Insert(std::string word) {
+        Trie* node = this;
+        for (auto& ch : word) {
+            int pos = ch - 'a';
+            if (node->children[pos] == nullptr) {
+                node->children[pos] = new Trie();
+            }
+            node = node->children[pos];
+        }
+        node->isEnd = true;
+    }
+
+    bool Search(std::string word) {
+        Trie* node = this;
+        for (auto& ch : word) {
+            int pos = ch - 'a';
+            if (node->children[pos] == nullptr) {
+                return false;
+            }
+            node = node->children[pos];
+        }
+        return node != nullptr && node->isEnd;
+    }
+
+    bool Del(Trie* node, std::string word, int pos) {
+        node = this;
+        if (pos == word.size()) {
+            node->isEnd = false;
+        } else {
+            char ch = word[pos];
+            ch -= 'a';
+            if (node->children[ch] != nullptr) {
+                Del(node->children[ch], word, pos + 1);
+                node->children[ch] = nullptr;
+            }
+        }
+        return !node->isEnd;
+    }
+};
+
+int main() {
+    Trie* trie = new Trie();
+    trie->Insert("to");
+    trie->Insert("in");
+    trie->Insert("tea");
+    trie->Insert("ted");
+    trie->Insert("ten");
+    trie->Insert("inner");
+    std::cout << "search \"to\": " << trie->Search("to") << std::endl;
+    std::cout << "search \"inn\": " << trie->Search("inn") << std::endl;
+    std::cout << "search \"in\": " << trie->Search("in") << std::endl;
+    std::cout << "search \"inner\": " << trie->Search("inner") << std::endl;
+    std::cout << "search \"ten\": " << trie->Search("ten") << std::endl;
+    std::cout << "delete \"ten\": " << trie->Del(trie, "ten", 0) << std::endl;
+    std::cout << "search \"ten\": " << trie->Search("ten") << std::endl;
+    return 0;
+}
 ```
